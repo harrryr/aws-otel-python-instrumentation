@@ -107,8 +107,6 @@ jobs:
 
       - name: Get the checksum of the latest release and append to metafile.json
         run: |
-          pwd
-          ls
           ARTIFACT_NAME="aws_opentelemetry_distro-${{ env.VERSION }}-py3-none-any.whl"
           curl -L -o $ARTIFACT_NAME https://github.com/aws-observability/aws-otel-python-instrumentation/releases/download/${{ env.VERSION }}/$ARTIFACT_NAME
 
@@ -121,6 +119,7 @@ jobs:
                             '.release += [{"version": $version, "checksum": [{"name": $name, "checksum": $checksum}]}]' "$FILE")
 
           echo "$UPDATED_JSON" > "$FILE"
+          git add release-build-metadata.json
 
       - name: Push changes to Github
         run: |
