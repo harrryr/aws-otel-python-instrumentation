@@ -78,6 +78,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ env.BOT_TOKEN_GITHUB_RW_PATOKEN }}
+          ref: add-checksum-test
 
       - name: Configure Git
         run: |
