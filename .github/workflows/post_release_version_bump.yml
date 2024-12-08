@@ -111,6 +111,7 @@ jobs:
           curl -L -o $ARTIFACT_NAME https://github.com/aws-observability/aws-otel-python-instrumentation/releases/download/v${{ env.VERSION }}/$ARTIFACT_NAME
 
           CHECKSUM=$(shasum -a 256 $ARTIFACT_NAME | awk '{ print $1 }')
+          echo $CHECKSUM
 
           FILE="release-build-metadata.json"
           UPDATED_JSON=$(jq --arg version "${{ env.VERSION }}" \
