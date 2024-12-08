@@ -87,8 +87,8 @@ jobs:
 
       - name: Extract Major.Minor Version and setup Env variable
         run: |
-          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-          echo "MAJOR_MINOR=$(echo ${{ github.event.inputs.version }} | sed -E 's/([0-9]+\.[0-9]+)\.[0-9]+/\1/')" >> $GITHUB_ENV
+          echo "VERSION=0.7.0" >> $GITHUB_ENV
+          echo "MAJOR_MINOR=$(echo 0.7.0 | sed -E 's/([0-9]+\.[0-9]+)\.[0-9]+/\1/')" >> $GITHUB_ENV
 
       - name: Determine release branch and checkout
         run: |
@@ -105,19 +105,17 @@ jobs:
           git add aws-opentelemetry-distro/src/amazon/opentelemetry/distro/version.py
           git add .github/workflows/daily_scan.yml
   
-      - name: Get the checksum of the latest release and append to metafile.json
+      - name: Append latest release checksum to release-build-metadata.json
         run: |
-          echo "ARTIFACT_NAME='aws_opentelemetry_distro-${{ env.VERSION }}-py3-none-any.whl'" >> $GITHUB_ENV
+          ARTIFACT_NAME="aws_opentelemetry_distro-${{ env.VERSION }}-py3-none-any.whl"
           curl -L -o $ARTIFACT_NAME https://github.com/aws-observability/aws-otel-python-instrumentation/releases/download/v${{ env.VERSION }}/$ARTIFACT_NAME
 
-          echo "CHECKSUM=$(shasum -a 256 $ARTIFACT_NAME | awk '{ print $1 }')"" >> $GITHUB_ENV
+          CHECKSUM=$(shasum -a 256 $ARTIFACT_NAME | awk '{ print $1 }')
 
-      - name: Append checksum to metafile
-        run: |
           FILE="release-build-metadata.json"
           UPDATED_JSON=$(jq --arg version "${{ env.VERSION }}" \
-                            --arg name "${{ env.ARTIFACT_NAME }}" \
-                            --arg checksum "${{ env.CHECKSUM }}" \
+                            --arg name "$ARTIFACT_NAME" \
+                            --arg checksum "$CHECKSUM" \
                             '.release += [{"version": $version, "checksum": [{"name": $name, "checksum": $checksum}]}]' "$FILE")
 
           echo "$UPDATED_JSON" > "$FILE"
